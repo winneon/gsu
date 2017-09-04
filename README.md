@@ -24,13 +24,13 @@ gsu depends heavily on maim, slop, FFmpeg, curl, and jq for its functionality. T
 #### Arch Linux
 
 ```
-$ sudo pacman -S unzip maim slop ffmpeg curl jq
+$ sudo pacman -S unzip make maim slop ffmpeg curl jq
 ```
 
 #### Debian
 
 ```
-$ sudo apt-get install unzip maim slop ffmpeg curl jq
+$ sudo apt-get install unzip make maim slop ffmpeg curl jq
 ```
 
 ---
