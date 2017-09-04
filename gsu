@@ -13,13 +13,11 @@ GENERAL OPTIONS
   -v, --version            Show the current version
 
   -u, --upload             Upload after running the utility
+  -n, --nocursor           Hide the cursor
 
   -s, --screenshot         Take a screenshot
-  -v, --video              Record a video of the screen
+  -m, --video              Record a video of the screen
   -g, --gif                Record a video and convert it to the gif format
-
-SCREENSHOT OPTIONS
-  -n, --nocursor           Hide the cursor (screenshot only)
 
 VIDEO OPTIONS
   -c, --countdown NUM      Countdown before recording"
@@ -30,6 +28,13 @@ VIDEO OPTIONS
 print_version() {
 	echo "gsu $VERSION"
 	exit 0
+}
+
+print_not_int() {
+	regex=$(echo "$1" | sed -e "s/^-\{1,2\}//")
+
+	echo "gsu: value for '$regex' is not an integer"
+	exit 1
 }
 
 print_invalid_option() {
@@ -65,15 +70,19 @@ get_args() {
 		case "$1" in
 			"-h" | "--help") print_help ;;
 			"-v" | "--version") print_version ;;
-
 			"-u" | "--upload") upload="$1" ;;
-
 			"-s" | "--screenshot") set_type "screenshot" ;;
-			"-v" | "--video") set_type "video" ;;
+			"-m" | "--video") set_type "video" ;;
 			"-g" | "--gif") set_type "gif" ;;
+			"-n" | "--nocursor") nocursor="-u"; draw_mouse="-draw_mouse 0" ;;
 
-			"-n" | "--nocursor") nocursor="-u" ;;
-			"-c" | "--countdown") countdown_enable="$2" ;;
+			"-c" | "--countdown")
+				if ! [[ $2 =~ ^[0-9]+$ ]]; then
+					print_not_int "$1"
+				fi
+
+				countdown_enable="$2"
+			;;
 
 			-*) print_invalid_option "$1" ;;
 
@@ -95,15 +104,18 @@ get_args() {
 get_config() {
 	mkdir -p "$config_path"
 
-	if [[ -f "$config_path/config.conf" ]]; then
-		source "$config_path/config.conf"
-	elif [[ -f "config/config.conf" ]]; then
-		cp "config/config.conf" "$config_path"
-		source "$config_path/config.conf"
-	else
-		echo "gsu: unable to find the config file"
-		exit 1
+	if [[ ! -f "$config_path/config.conf" ]]; then
+		if [[ -f "SYSCONFDIR/config.conf" ]]; then
+			cp "SYSCONFDIR/config.conf" "$config_path"
+		elif [[ -f "config/config.conf" ]]; then
+			cp "config/config.conf" "$config_path"
+		else
+			echo "gsu: unable to find the config file"
+			exit 1
+		fi
 	fi
+
+	source "$config_path/config.conf"
 }
 
 set_type() {
@@ -171,15 +183,13 @@ take_video() {
 		print_manually_quit
 	fi
 
-	echo "Press [q] or [Ctrl+C] to stop recording."
-
 	if [[ ! -z "$countdown_enable" ]]; then
 		countdown "$countdown_enable" "Handing control over to ffmpeg in COUNTNUM seconds."
 	fi
 
-	echo "Recording..."
+	echo "Press [q] or [Ctrl+C] to stop recording."
 
-	local cmd=$(ffmpeg -y -f alsa -i pulse -r 30 -f x11grab -s "$W"x"$H" -i :0.0+$X,$Y -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
+	local cmd=$(ffmpeg -y -f alsa -i pulse -r 30 -f x11grab $draw_mouse -s "$W"x"$H" -i :0.0+$X,$Y -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
 
 	if [[ -z "$cmd" ]]; then
 		echo "Stopped recording."
