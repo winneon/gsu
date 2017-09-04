@@ -38,8 +38,8 @@ $ sudo apt-get install unzip make maim slop ffmpeg curl jq
 After installing the dependents, run the following commands to install gsu.
 
 ```
-$ curl -o gsu.zip https://codeload.github.com/winneon/gsu/zip/master
-$ unzip gsu.zip && cd gsu-master
+$ curl -o gsu.zip https://codeload.github.com/winneon/gsu/zip/v1.0.0
+$ unzip gsu.zip && cd gsu-1.0.0
 $ sudo make install
 ```
 
