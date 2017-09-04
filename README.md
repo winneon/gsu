@@ -27,7 +27,7 @@ gsu depends heavily on maim, slop, FFmpeg, curl, and jq for its functionality. T
 $ sudo pacman -S tar make maim ffmpeg curl jq
 ```
 
-#### Debian
+#### Debian/Ubuntu 17.04+
 
 ```
 $ sudo apt-get install tar make maim ffmpeg curl jq
