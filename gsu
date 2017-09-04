@@ -1,23 +1,34 @@
 #!/usr/bin/env bash
 
+VERSION="0.1.0"
 config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
 
 print_help() {
 	echo "\
-usage: gsu [option] <filename>
-  -h,--help               Show the help menu
-  -u,--upload             Upload after running the utility
+Usage: gsu [OPTION]... SOURCE
+A general screenshot and upload utility for images, video, and gifs.
 
-  -s,--screenshot         Take a screenshot
-  -v,--video              Record a video of the screen
-  -g,--gif                Record a video and convert it to the gif format
+GENERAL OPTIONS
+  -h, --help               Show the help menu
+  -v, --version            Show the current version
+
+  -u, --upload             Upload after running the utility
+
+  -s, --screenshot         Take a screenshot
+  -v, --video              Record a video of the screen
+  -g, --gif                Record a video and convert it to the gif format
 
 SCREENSHOT OPTIONS
-  -n,--nocursor           Hide the cursor (screenshot only)
+  -n, --nocursor           Hide the cursor (screenshot only)
 
 VIDEO OPTIONS
-  -c,--countdown NUM      Countdown before recording"
+  -c, --countdown NUM      Countdown before recording"
 
+	exit 0
+}
+
+print_version() {
+	echo "gsu $VERSION"
 	exit 0
 }
 
@@ -53,6 +64,8 @@ get_args() {
 	while [[ "$1" ]]; do
 		case "$1" in
 			"-h" | "--help") print_help ;;
+			"-v" | "--version") print_version ;;
+
 			"-u" | "--upload") upload="$1" ;;
 
 			"-s" | "--screenshot") set_type "screenshot" ;;
