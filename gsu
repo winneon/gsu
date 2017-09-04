@@ -1,0 +1,310 @@
+#!/usr/bin/env bash
+
+config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
+
+print_help() {
+	echo "\
+usage: gsu [option] <filename>
+  -h,--help               Show the help menu
+  -u,--upload             Upload after running the utility
+
+  -s,--screenshot         Take a screenshot
+  -v,--video              Record a video of the screen
+  -g,--gif                Record a video and convert it to the gif format
+
+SCREENSHOT OPTIONS
+  -n,--nocursor           Hide the cursor (screenshot only)
+
+VIDEO OPTIONS
+  -c,--countdown NUM      Countdown before recording"
+
+	exit 0
+}
+
+print_invalid_option() {
+	regex=$(echo "$1" | sed -e "s/^-\{1,2\}//")
+
+	echo "\
+gsu: invalid option -- '$regex'
+Try 'gsu --help' for more information."
+
+	exit 1
+}
+
+print_missing_operand() {
+	echo "\
+gsu: missing operand
+Try 'gsu --help' for more information."
+
+	exit 1
+}
+
+print_missing_deps() {
+	echo "gsu: missing required dependency -- '$1'"
+	exit 1
+}
+
+print_manually_quit() {
+	echo "gsu: manually quit from user action"
+	exit 0
+}
+
+get_args() {
+	while [[ "$1" ]]; do
+		case "$1" in
+			"-h" | "--help") print_help ;;
+			"-u" | "--upload") upload="$1" ;;
+
+			"-s" | "--screenshot") set_type "screenshot" ;;
+			"-v" | "--video") set_type "video" ;;
+			"-g" | "--gif") set_type "gif" ;;
+
+			"-n" | "--nocursor") nocursor="-u" ;;
+			"-c" | "--countdown") countdown_enable="$2" ;;
+
+			-*) print_invalid_option "$1" ;;
+
+			*)
+				if [[ "$1" =~ ^[a-zA-Z0-9_.-]+$ ]]; then
+					operand="$1"
+				fi
+			;;
+		esac
+
+		shift
+	done
+
+	if [[ -z "$operand" ]]; then
+		print_missing_operand
+	fi
+}
+
+get_config() {
+	mkdir -p "$config_path"
+
+	if [[ -f "$config_path/config.conf" ]]; then
+		source "$config_path/config.conf"
+	elif [[ -f "config/config.conf" ]]; then
+		cp "config/config.conf" "$config_path"
+		source "$config_path/config.conf"
+	else
+		echo "gsu: unable to find the config file"
+		exit 1
+	fi
+}
+
+set_type() {
+	if [[ -z "$type" ]]; then
+		type="$1"
+	fi
+}
+
+countdown() {
+	for ((i = $1; i > 0; i--)); do
+		echo -ne "\r${2//COUNTNUM/$i}"
+		sleep 1
+	done
+
+	echo
+}
+
+log() {
+	if [[ ! -d "$config_path/logs" ]]; then
+		mkdir -p "$config_path/logs"
+	fi
+
+	echo "$1" >"$config_path/logs/$(date +'%Y.%m.%d-%H.%M.%S.%N').log"
+}
+
+take_screenshot() {
+	if ! type -p maim >/dev/null; then
+		print_missing_deps "maim"
+	fi
+
+	local cmd=$(maim $nocursor -s "$operand" 2>&1>/dev/null)
+
+	if [[ ! -z "$cmd" ]]; then
+		if [[ "$cmd" == *"keystroke or right-click"* ]]; then
+			print_manually_quit
+		fi
+
+		log "$cmd"
+
+		echo "gsu: maim returned an error"
+		echo "Check the most recent log in '$config_path/logs'."
+
+		exit 1
+	fi
+}
+
+take_video() {
+	local output="$operand"
+
+	if ! type -p slop >/dev/null; then
+		print_missing_deps "slop"
+	fi
+
+	if ! type -p ffmpeg >/dev/null; then
+		print_missing_deps "ffmpeg"
+	fi
+
+	if [[ "$type" == "gif" ]]; then
+		output="$operand.mp4"
+	fi
+
+	read -r X Y W H G ID < <(slop -f "%x %y %w %h %g %i")
+
+	if [[ -z "$X" ]] || [[ -z "$Y" ]] || [[ -z "$W" ]] || [[ -z "$H" ]]; then
+		print_manually_quit
+	fi
+
+	echo "Press [q] or [Ctrl+C] to stop recording."
+
+	if [[ ! -z "$countdown_enable" ]]; then
+		countdown "$countdown_enable" "Handing control over to ffmpeg in COUNTNUM seconds."
+	fi
+
+	echo "Recording..."
+
+	local cmd=$(ffmpeg -y -f alsa -i pulse -r 30 -f x11grab -s "$W"x"$H" -i :0.0+$X,$Y -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
+
+	if [[ -z "$cmd" ]]; then
+		echo "Stopped recording."
+	else
+		log "$cmd"
+
+		echo -e "\ngsu: ffmpeg returned an error"
+		echo "Check the most recent log in '$config_path/logs'."
+
+		exit 1
+	fi
+}
+
+make_gif() {
+	if ! type -p ffmpeg >/dev/null; then
+		print_missing_deps "ffmpeg"
+	fi
+
+	echo "Generating your GIF. This could take awhile depending on how large the selection was."
+	local cmd=$(ffmpeg -y -i "$operand.mp4" -vf "fps=30,palettegen" -loglevel error "/tmp/palette.png" 2>&1>/dev/null)
+
+	if [[ -z "$cmd" ]]; then
+		cmd=$(ffmpeg -y -i "$operand.mp4" -i "/tmp/palette.png" -filter_complex "fps=30,scale=flags=lanczos[x];[x][1:v]paletteuse" -loglevel error "$operand")
+
+		if [[ -z "$cmd" ]]; then
+			return
+		fi
+	fi
+
+	log "$cmd"
+
+	echo -e "\ngsu: ffmpeg returned an error"
+	echo "Check the most recent log in '$config_path/logs'."
+
+	exit 1
+}
+
+upload() {
+	pushd $(dirname $operand) &>/dev/null
+	local absolute="$PWD/$(basename $operand)"
+	popd &>/dev/null
+
+	local cmd
+
+	case "$type" in
+		"screenshot")
+			if [[ -z "$S_UPLOAD" ]]; then
+				cmd=$(curl --progress-bar -F "randomname=true" -F "file=@$absolute" "https://uguu.se/api.php?d=upload-tool")
+			else
+				cmd=$(eval "${S_UPLOAD//GSUFILEOUT/$absolute}")
+			fi
+		;;
+
+		"video")
+			if [[ -z "$V_UPLOAD" ]]; then
+				if ! type -p jq >/dev/null; then
+					print_missing_deps "jq"
+				fi
+
+				if [[ -z "$STREAMABLE_USER" ]] || [[ -z "$STREAMABLE_PASS" ]]; then
+					echo -e "\ngsu: invalid streamable credentials"
+					echo "Fill in your credentials in '$config_path/config.conf' and try again."
+
+					exit 1
+				else
+					cmd=$(curl --progress-bar -u "$STREAMABLE_USER:$STREAMABLE_PASS" -F "file=@$absolute" "https://api.streamable.com/upload" | jq -r ".shortcode")
+
+					if [[ "${#cmd}" == 5 ]]; then
+						cmd="https://streamable.com/$cmd"
+					fi
+				fi
+			else
+				cmd=$(eval "${V_UPLOAD//GSUFILEOUT/$absolute}")
+			fi
+		;;
+
+		"gif")
+			if [[ -z "$G_UPLOAD" ]]; then
+				local cmd=$(curl -s -X POST -H "Content-Type: application/json" "https://api.gfycat.com/v1/gfycats")
+
+				if echo "$cmd" | jq -e ".gfyname" &>/dev/null; then
+					local output=$(echo "$cmd" | jq -r ".gfyname")
+					cp "$absolute" "$output"
+
+					cmd=$(curl --progress-bar -w "%{http_code}" --upload-file "$output" "https://filedrop.gfycat.com")
+					rm "$output"
+
+					if [[ "$cmd" == "200" ]]; then
+						echo "Gfycat is processing..."
+						local count=0
+
+						while [[ "$(curl -s https://api.gfycat.com/v1/gfycats/fetch/status/$output | jq -e -r '.task')" != "complete" ]]; do
+							((count++))
+
+							if [[ $count == 300 ]]; then
+								echo -e "\ngsu: gfycat timed out while processing"
+								exit 1
+							fi
+
+							sleep 1
+						done
+
+						cmd="https://gfycat.com/$output"
+					else
+						echo -e "\ngsu: gfycat returned an invalid http code -- '$cmd'"
+						exit 1
+					fi
+				fi
+			else
+				cmd=$(eval "${G_UPLOAD//GSUFILEOUT/$absolute}")
+			fi
+		;;
+	esac
+
+	if type -p xclip >/dev/null && [[ "$cmd" == "http"* ]]; then
+		echo -n "$cmd" | xclip
+		echo -n "$cmd" | xclip -sel clip
+	fi
+
+	echo "$cmd"
+}
+
+main() {
+	get_config
+	get_args "$@"
+	set_type "screenshot"
+
+	case "$type" in
+		"screenshot") take_screenshot ;;
+		"video") take_video ;;
+		"gif") take_video; make_gif ;;
+	esac
+
+	if [[ ! -z "$upload" ]]; then
+		upload
+	fi
+
+	exit 0
+}
+
+main "$@"
