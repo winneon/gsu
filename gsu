@@ -47,6 +47,14 @@ Try 'gsu --help' for more information."
 	exit 1
 }
 
+print_invalid_operand() {
+	echo "\
+gsu: invalid operand -- '$1'
+Valid characters: alphanumeric, dot, slash, underscore, dash."
+
+	exit 1
+}
+
 print_missing_operand() {
 	echo "\
 gsu: missing operand
@@ -89,6 +97,8 @@ get_args() {
 			*)
 				if [[ "$1" =~ ^[a-zA-Z0-9_.\/-]+$ ]]; then
 					operand="$1"
+				else
+					print_invalid_operand "$1"
 				fi
 			;;
 		esac
