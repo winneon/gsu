@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.0.0"
+VERSION="1.0.0-git"
 config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
 
 print_help() {
@@ -9,18 +9,18 @@ Usage: gsu [OPTION]... SOURCE
 A general screenshot and upload utility for images, video, and gifs.
 
 GENERAL OPTIONS
-  -h, --help               Show the help menu
-  -v, --version            Show the current version
+  -h, --help              Show the help menu
+  -v, --version           Show the current version
 
-  -u, --upload             Upload after running the utility
-  -n, --nocursor           Hide the cursor
+  -u, --upload            Upload after running the utility
+  -n, --nocursor          Hide the cursor
 
-  -s, --screenshot         Take a screenshot
-  -m, --video              Record a video of the screen
-  -g, --gif                Record a video and convert it to the gif format
+  -s, --screenshot        Take a screenshot
+  -m, --video             Record a video of the screen
+  -g, --gif               Record a video and convert it to the gif format
 
 VIDEO OPTIONS
-  -c, --countdown NUM      Countdown before recording"
+  -c, --countdown NUM     Countdown before recording"
 
 	exit 0
 }
