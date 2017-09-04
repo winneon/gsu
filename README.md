@@ -39,7 +39,7 @@ After installing the dependents, run the following commands to install gsu.
 
 ```
 $ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/v1.0.0
-$ tar xvf gsu.tar.gz cd gsu-1.0.0
+$ tar xvf gsu.tar.gz cd gsu-1.0.1
 $ sudo make install
 ```
 
