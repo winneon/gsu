@@ -15,7 +15,7 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 
 ### Arch Linux
 
-Install [**gsu**](https://aur.archlinux.org/packages/gsu/) from the AUR.
+Install [**gsu**](https://aur.archlinux.org/packages/gsu/) or [**gsu**](https://aur.archlinux.org/packages/gsu-git/) from the AUR.
 
 ### Install From Source
 
