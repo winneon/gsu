@@ -4,9 +4,9 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 
 ## Features
 
-* Screenshot capture
-* Video capture
-* Gif capture
+* Screenshot capture.
+* Video capture.
+* Gif capture.
 * Built-in uploading to uguu.se, streamable, and gfycat.
 * Custom uploading capability if the above services don't suit your fancy.
 * A clean and easy to understand CLI.
