@@ -15,7 +15,7 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 
 ### Arch Linux
 
-Not yet. See below.
+Install [**gsu**](https://aur.archlinux.org/packages/gsu/) from the AUR.
 
 ### Install From Source
 
@@ -24,13 +24,13 @@ gsu depends heavily on maim, slop, FFmpeg, curl, and jq for its functionality. T
 #### Arch Linux
 
 ```
-$ sudo pacman -S unzip make maim slop ffmpeg curl jq
+$ sudo pacman -S tar make maim ffmpeg curl jq
 ```
 
 #### Debian
 
 ```
-$ sudo apt-get install unzip make maim slop ffmpeg curl jq
+$ sudo apt-get install tar make maim ffmpeg curl jq
 ```
 
 ---
@@ -38,8 +38,8 @@ $ sudo apt-get install unzip make maim slop ffmpeg curl jq
 After installing the dependents, run the following commands to install gsu.
 
 ```
-$ curl -o gsu.zip https://codeload.github.com/winneon/gsu/zip/v1.0.0
-$ unzip gsu.zip && cd gsu-1.0.0
+$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/v1.0.0
+$ tar xvf gsu.tar.gz cd gsu-1.0.0
 $ sudo make install
 ```
 
