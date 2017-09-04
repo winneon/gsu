@@ -13,7 +13,7 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 
 ## Installation
 
-### AUR (Arch Linux)
+### Arch Linux
 
 Not yet. See below.
 
@@ -39,7 +39,8 @@ After installing the dependents, run the following commands to install gsu.
 
 ```
 $ curl -o gsu.zip https://codeload.github.com/winneon/gsu/zip/master
-$ unzip gsu.zip
+$ unzip gsu.zip && cd gsu-master
+$ sudo make install
 ```
 
 ## Credits
