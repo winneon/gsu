@@ -87,7 +87,7 @@ get_args() {
 			-*) print_invalid_option "$1" ;;
 
 			*)
-				if [[ "$1" =~ ^[a-zA-Z0-9_.-]+$ ]]; then
+				if [[ "$1" =~ ^[a-zA-Z0-9_.\/-]+$ ]]; then
 					operand="$1"
 				fi
 			;;
