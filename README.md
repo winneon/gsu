@@ -63,7 +63,7 @@ $ sudo apt-get install maim slop ffmpeg curl jq
 
 #### Ubuntu 17.04
 
-**Unsupported.** slop and maim both are terribly out of date in Ubuntu's 17.04 repositories, resulting in artifacting and improper screenshots. Keep this in mind when installing gsu. When Ubuntu 17.10 is released, it will be properly supported.
+**Unsupported.** slop and maim both are terribly out of date in Ubuntu's 17.04 repositories, resulting in artifacting and improper screenshots. When Ubuntu 17.10 is released, it will be properly supported.
 
 If you can't wait until then, you can install [slop] and [maim] from source. Afterwards, run the following command.
 
@@ -96,11 +96,10 @@ Here are some frequent problems users may face and their respective solutions. I
 
 ### The outputted screenshot has weird black or white sections.
 
-This is a common problem with older versions of maim, usually with  You have a few choices:
+This is a common problem with older versions of maim. You have a few choices:
 
 * On Debian 8, enable the `unstable` APT repository, and upgrade maim and slop.
-* On Ubuntu 17.04,
-* If the above is too scary, install both maim and slop from source.
+* On Ubuntu 17.04 and other distros, install both maim and slop from source.
 
 ## Credits
 
