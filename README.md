@@ -71,7 +71,7 @@ If you can't wait until then, you can install [slop] and [maim] from source. Aft
 $ sudo apt-get install ffmpeg curl jq
 ```
 
-[slop]: https://github.com/naelstrof/maim#install-using-your-package-manager-preferred
+[slop]: https://github.com/naelstrof/slop#install-using-cmake-requires-cmake
 [maim]: https://github.com/naelstrof/maim#install-using-your-package-manager-preferred
 
 #### Other Linux or BSD
