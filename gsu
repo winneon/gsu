@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.1.1"
+VERSION="1.1.1-git"
 config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
 
 print_help() {
@@ -233,12 +233,24 @@ get_command() {
 				countdown "$countdown_enable" "Handing control over to ffmpeg in COUNTNUM seconds."
 			fi
 
+			if [[ -z "$AUDIO" ]]; then
+				if ! type -p pulseaudio >/dev/null; then
+					echo -e "\ngsu: no audio device set, default device 'pulse' cannot be found"
+					echo "Either install pulseaudio, "
+					echo "or add your audio device to `$config_path/config.conf`"
+
+					exit 1
+				fi
+
+				AUDIO="pulse"
+			fi
+
 			echo "Press [q] or [Ctrl+C] to stop recording."
 
 			if [[ -z "$display" ]]; then
-				cmd=$(ffmpeg -y -f alsa -i pulse -r 30 -f x11grab -show_region 1 $draw_mouse -s "$W"x"$H" -i :0.0+$X,$Y -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
+				cmd=$(ffmpeg -y -f alsa -i $AUDIO -r 30 -f x11grab -show_region 1 $draw_mouse -s "$W"x"$H" -i :0.0+$X,$Y -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
 			else
-				cmd=$(ffmpeg -y -f alsa -i pulse -r 30 -f x11grab -show_region 1 $draw_mouse -s "$MONW"x"$MONH" -i :0.0+$MONX,$MONY -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
+				cmd=$(ffmpeg -y -f alsa -i $AUDIO -r 30 -f x11grab -show_region 1 $draw_mouse -s "$MONW"x"$MONH" -i :0.0+$MONX,$MONY -c:v libx264 -crf 18 -preset:v ultrafast -c:a aac -b:a 192k -loglevel error "$output" 2>&1>/dev/null)
 			fi
 		;;
 	esac

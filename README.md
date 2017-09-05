@@ -65,7 +65,7 @@ $ sudo apt-get install maim slop ffmpeg curl jq
 
 **Unsupported.** slop and maim both are terribly out of date in Ubuntu's 17.04 repositories, resulting in artifacting and improper screenshots. When Ubuntu 17.10 is released, it will be properly supported.
 
-If you can't wait until then, you can install [slop] and [maim] from source. Afterwards, run the following command.
+If you can't wait until then, you can install [slop] and [maim] from source. Afterwards, run the following command to install the remaining dependencies.
 
 ```
 $ sudo apt-get install ffmpeg curl jq
@@ -90,6 +90,37 @@ $ sudo make install
 
 You can optionally install `xclip` if you want automatic URL clipboard pasting after the utility finishes an upload.
 
+## Configuration
+
+The configuration file can be found in `$XDG_CONFIG_HOME/gsu`. The most common location is `~/.config/gsu`.
+
+```bash
+# Audio input device. If empty, gsu defaults to pulseaudio.
+# See https://www.ffmpeg.org/ffmpeg-devices.html#Input-Devices for a list
+# of valid input devices.
+AUDIO=""
+
+# Streamable email/username.
+# REQUIRED for video upload without a custom upload command.
+STREAMABLE_USER=""
+
+# Streamable password.
+# REQUIRED for video upload without a custom upload command.
+STREAMABLE_PASS=""
+
+# Custom screenshot upload command. Leave empty to upload to uguu.se.
+# Use the string "GSUFILEOUT" to refer to your gsu operand.
+S_UPLOAD=""
+
+# Custom video upload command. Leave empty to upload to streamable.
+# Use the string "GSUFILEOUT" to refer to your gsu operand.
+V_UPLOAD=""
+
+# Custom gif upload command. Leave empty to upload to uguu.se.
+# Use the string "GSUFILEOUT" to refer to your gsu operand.
+G_UPLOAD=""
+```
+
 ## Troubleshooting
 
 Here are some frequent problems users may face and their respective solutions. If you have more solutions, feel free to send in an issue or pull request.
@@ -100,6 +131,10 @@ This is a common problem with older versions of maim. You have a few choices:
 
 * On Debian 8, enable the `unstable` APT repository, and upgrade maim and slop.
 * On Ubuntu 17.04 and other distros, install both maim and slop from source.
+
+### There is no audio in the captured video.
+
+Pulseaudio is the default audio capture device. If you do not use pulseaudio, adjust your audio capture device in the configuration file.
 
 ## Credits
 
