@@ -116,7 +116,7 @@ S_UPLOAD=""
 # Use the string "GSUFILEOUT" to refer to your gsu operand.
 V_UPLOAD=""
 
-# Custom gif upload command. Leave empty to upload to uguu.se.
+# Custom gif upload command. Leave empty to upload to gfycat.
 # Use the string "GSUFILEOUT" to refer to your gsu operand.
 G_UPLOAD=""
 ```
