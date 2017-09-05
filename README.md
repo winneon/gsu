@@ -38,8 +38,8 @@ $ sudo apt-get install tar make maim ffmpeg curl jq
 After installing the dependents, run the following commands to install gsu.
 
 ```
-$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/v1.1.0
-$ tar xvf gsu.tar.gz cd gsu-1.1.0
+$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/v1.1.1
+$ tar xvf gsu.tar.gz cd gsu-1.1.1
 $ sudo make install
 ```
 

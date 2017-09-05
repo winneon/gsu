@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.1.0"
+VERSION="1.1.1"
 config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
 
 print_help() {
