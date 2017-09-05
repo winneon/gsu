@@ -136,6 +136,10 @@ This is a common problem with older versions of maim. You have a few choices:
 
 Pulseaudio is the default audio capture device. If you do not use pulseaudio, adjust your audio capture device in the configuration file.
 
+If you do use pulseaudio, use a program like `pavucontrol` to change the input device to a monitor of your audio output device. If you use `pavucontrol`, the resulting setup should look similar to below.
+
+![pavucontrol example](http://i.imgur.com/qbN5741.png)
+
 ## Credits
 
 * [Dalton Nell](https://github.com/naelstrof) for maim and slop, used for screenshot creation and selections
