@@ -267,6 +267,22 @@ log() {
 	echo "$1" >"$config_path/logs/$(date +'%Y.%m.%d-%H.%M.%S.%N').log"
 }
 
+check_valid_exts() {
+	local filename="${operand##*/}"
+	local extension="${filename##*.}"
+
+	IFS="," read -ra exts <<< "$1"
+
+	for ext in "${exts[@]}"; do
+		if [[ "$extension" == "$ext" ]]; then
+			return
+		fi
+	done
+
+	echo "gsu: invalid $type file extension -- '$extension'"
+	exit 1
+}
+
 take_screenshot() {
 	if ! type -p maim >/dev/null; then
 		print_missing_deps "maim"
@@ -432,9 +448,30 @@ main() {
 	set_type "screenshot"
 
 	case "$type" in
-		"screenshot") take_screenshot ;;
-		"video") take_video ;;
-		"gif") take_video; make_gif ;;
+		"screenshot")
+			if [[ -z "$S_UPLOAD" ]]; then
+				check_valid_exts "png,jpg"
+			fi
+
+			take_screenshot
+		;;
+
+		"video")
+			if [[ -z "$V_UPLOAD" ]]; then
+				check_valid_exts "mp4,mkv,mov"
+			fi
+
+			take_video
+		;;
+
+		"gif")
+			if [[ -z "$G_UPLOAD" ]]; then
+				check_valid_exts "gif"
+			fi
+
+			take_video
+			make_gif
+		;;
 	esac
 
 	if [[ ! -z "$upload" ]]; then
