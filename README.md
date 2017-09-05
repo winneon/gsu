@@ -43,7 +43,7 @@ Install **[gsu]** or **[gsu-git]** from the AUR.
 [gsu]: https://aur.archlinux.org/packages/gsu/
 [gsu-git]: https://aur.archlinux.org/packages/gsu-git/
 
-### Install From Source
+### Universal Install
 
 gsu depends heavily on maim, slop, FFmpeg, curl, and jq for its functionality. To install gsu's dependencies, run the following commands in accordance to your distro.
 
@@ -83,8 +83,8 @@ Install `maim`, `slop`, `ffmpeg`, `curl`, and `jq` using your package manager of
 After installing the dependents, run the following commands to install gsu.
 
 ```
-$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/1.1.1
-$ tar xvf gsu.tar.gz && cd gsu-1.1.1
+$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/1.1.2
+$ tar xvf gsu.tar.gz && cd gsu-1.1.2
 $ sudo make install
 ```
 
