@@ -177,8 +177,13 @@ get_command() {
 				;;
 
 				*)
-					if [[ $desktop =~ ^[0-9]+$ ]]; then
-						echo "num!"
+					if [[ "$display" =~ ^[0-9]+$ ]]; then
+						if (($display == $i + 1)); then
+							MONW=$TEMPMONW
+							MONH=$TEMPMONH
+							MONX=$TEMPMONX
+							MONY=$TEMPMONY
+						fi
 					else
 						if (($TEMPMONW > $MONW)); then
 							((MONW=$MONW + $TEMPMONW))
