@@ -162,10 +162,10 @@ get_command() {
 
 			case "$display" in
 				"active")
-					if (( $XMOUSE >= $TEMPMONX )); then
-						if (( $XMOUSE <= $TEMPMONX+$TEMPMONW )); then
-							if (( $YMOUSE >= $TEMPMONY )); then
-								if (( $YMOUSE <= $TEMPMONY+$TEMPMONH )); then
+					if (($XMOUSE >= $TEMPMONX)); then
+						if (($XMOUSE <= $TEMPMONX + $TEMPMONW)); then
+							if (($YMOUSE >= $TEMPMONY)); then
+								if (($YMOUSE <= $TEMPMONY + $TEMPMONH)); then
 									MONW=$TEMPMONW
 									MONH=$TEMPMONH
 									MONX=$TEMPMONX
