@@ -15,7 +15,7 @@ GENERAL OPTIONS
   -u, --upload               Upload after running the utility
   -n, --nocursor             Hide the cursor
   -d, --display NUM|TYPE     Set the selection to a specific display.
-                             Values: number of display, 'active', 'all'
+                             Values: number of display, 'active', 'all' (default)
 
   -s, --screenshot           Take a screenshot
   -m, --video                Record a video of the screen
@@ -220,7 +220,7 @@ get_command() {
 			fi
 		;;
 
-		"video")
+		"video" | "gif")
 			if [[ -z "$display" ]]; then
 				read -r X Y W H G ID < <(slop -f "%x %y %w %h %g %i")
 
