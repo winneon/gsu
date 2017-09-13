@@ -18,8 +18,8 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 Usage: gsu [OPTION]... SOURCE
 A general screenshot and upload utility for images, video, and gifs.
 
-SOURCE defaults to \$XDG_CONFIG_HOME/gsu/imgs if nothing is provided.
-The most common location for \$XDG_CONFIG_HOME is ~/.config.
+SOURCE defaults to $XDG_CONFIG_HOME/gsu/imgs if nothing is provided.
+The most common location for $XDG_CONFIG_HOME is ~/.config.
 
 GENERAL OPTIONS
   -h, --help                 Show the help menu
