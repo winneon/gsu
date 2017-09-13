@@ -11,12 +11,15 @@ A general screenshot and upload utility for images, video, and gifs.
 GENERAL OPTIONS
   -h, --help                 Show the help menu
   -v, --version              Show the current version
+  -l, --list-displays        List your current displays and their resolutions.
 
   -u, --upload               Upload after running the utility
   -n, --nocursor             Hide the cursor
   -d, --display NUM|TYPE     Set the selection to a specific display.
+                             Can read from an argument or from stdin.
                              Values: number of display, 'active', 'all' (default)
 
+  -r, --dmenu                Select the below action from dmenu or rofi.
   -s, --screenshot           Take a screenshot
   -m, --video                Record a video of the screen
   -g, --gif                  Record a video and convert it to the gif format
@@ -29,6 +32,28 @@ VIDEO OPTIONS
 
 print_version() {
 	echo "gsu $VERSION"
+	exit 0
+}
+
+print_displays() {
+	local monitors=$(xrandr | grep -o "[0-9]*x[0-9]*[+-][0-9]*[+-][0-9]*")
+
+	if [[ -z "$monitors" ]]; then
+		echo "gsu: unable to find any displays"
+		exit 1
+	fi
+
+	readarray -t monitors <<< "$monitors"
+	local displays=""
+
+	for ((i = 0; i < ${#monitors[@]}; i++)); do
+		((num = i + 1))
+		displays="${displays}\n${num}: ${monitors[$i]}"
+	done
+
+	displays=$(sed 's/\\n//' <<< $displays)
+	echo -e "$displays"
+
 	exit 0
 }
 
@@ -66,13 +91,21 @@ Try 'gsu --help' for more information."
 }
 
 print_missing_deps() {
-	echo "gsu: missing required dependency -- '$1'"
+	local args=""
+
+	for arg in "$@"; do
+		args="$args '$arg'"
+	done
+
+	args=$(sed 's/ //' <<< $args)
+	echo "gsu: missing required dependency(s) -- $args"
+
 	exit 1
 }
 
 print_manually_quit() {
 	echo "gsu: manually quit from user action"
-	exit 0
+	exit 1
 }
 
 get_args() {
@@ -81,7 +114,36 @@ get_args() {
 			"-h" | "--help") print_help ;;
 			"-v" | "--version") print_version ;;
 			"-u" | "--upload") upload="$1" ;;
-			"-d" | "--display") display="$2" ;;
+			"-l" | "--list-displays") print_displays ;;
+
+			"-d" | "--display")
+				if [[ -t 0 ]]; then
+					display="$2"
+				else
+					display=$(cat)
+					display="${display:0:1}"
+
+					if [[ -z "$display" ]]; then
+						echo "gsu: display is empty, assuming quit from dmenu or rofi"
+						exit 1
+					fi
+				fi
+			;;
+
+			"-r" | "--dmenu")
+				if type -p dmenu >/dev/null; then
+					dmenu_type="dmenu"
+					break
+				fi
+
+				if type -p rofi >/dev/null; then
+					dmenu_type="rofi"
+					break
+				fi
+
+				print_missing_deps "dmenu or rofi"
+			;;
+
 			"-s" | "--screenshot") set_type "screenshot" ;;
 			"-m" | "--video") set_type "video" ;;
 			"-g" | "--gif") set_type "gif" ;;
