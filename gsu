@@ -132,16 +132,23 @@ get_args() {
 
 			"-r" | "--dmenu")
 				if type -p dmenu >/dev/null; then
-					dmenu_type="dmenu"
-					break
+					dmenu_type=(dmenu)
 				fi
 
 				if type -p rofi >/dev/null; then
-					dmenu_type="rofi"
-					break
+					dmenu_type=(rofi -dmenu -p "gsu > ")
 				fi
 
-				print_missing_deps "dmenu or rofi"
+				if [[ -z "$dmenu_type" ]]; then
+					print_missing_deps "dmenu or rofi"
+				else
+					case $(echo -e "Take a screenshot\nRecord a video\nRecord a video and covert it to the gif format" | "${dmenu_type[@]}") in
+						"Take a screenshot") set_type "screenshot" ;;
+						"Record a video") set_type "video" ;;
+						"Record a video and covert it to the gif format") set_type "gif" ;;
+						*) print_manually_quit ;;
+					esac
+				fi
 			;;
 
 			"-s" | "--screenshot") set_type "screenshot" ;;
