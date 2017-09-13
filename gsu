@@ -565,7 +565,7 @@ Fill in your credentials in '$config_path/config.conf' and try again."
 		echo -n "$cmd" | xsel -ib
 	fi
 
-	#notify "$cmd"
+	notify "$cmd"
 }
 
 remove_args() {
