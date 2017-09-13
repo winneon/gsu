@@ -111,6 +111,7 @@ The configuration file can be found in `$XDG_CONFIG_HOME/gsu`. The most common l
 #!/usr/bin/env bash
 
 # Terminal. Uncomment to use.
+# If uncommented, be sure that the terminal you are providing is installed.
 # If --terminal is provided, a new terminal using this variable will be opened.
 # Use the string "CMD" to refer to the command that is run (gsu).
 #
@@ -140,7 +141,6 @@ V_UPLOAD=""
 # Custom gif upload command. Leave empty to upload to gfycat.
 # Use the string "GSUFILEOUT" to refer to your gsu operand.
 G_UPLOAD=""
-
 ```
 
 ## Troubleshooting
