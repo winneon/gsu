@@ -22,29 +22,32 @@ SOURCE defaults to $XDG_CONFIG_HOME/gsu/imgs if nothing is provided.
 The most common location for $XDG_CONFIG_HOME is ~/.config.
 
 GENERAL OPTIONS
-  -h, --help                 Show the help menu
-  -v, --version              Show the current version
+  -h, --help                 Show the help menu.
+  -v, --version              Show the current version.
   -l, --list-displays        List your current displays and their resolutions.
-  --terminal                 Open interactive commands in a new terminal.
+  -u, --upload               Upload after running the utility.
+  --hide                     Minimize the current window while capturing.
+                             This is useful when running with --terminal to hide
+							 the newly opened term.
+  --terminal                 Open interactive commands in a new terminal..
                              SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
                              i.e. xbindkeys
-
   --notify                   Send a libnotify notification of the output.
 
 UTILITY OPTIONS
-  -u, --upload               Upload after running the utility
-  -n, --nocursor             Hide the cursor
+  -r, --dmenu                Select the one of the below options from dmenu or rofi.
+  -s, --screenshot           Take a screenshot. (default)
+  -m, --video                Record a video of the screen.
+  -g, --gif                  Record a video and convert it to the gif format.
+
+CAPTURE OPTIONS
+  -n, --nocursor             Hide the cursor.
   -d, --display NUM|TYPE     Set the selection to a specific display.
                              Can read from an argument or from stdin.
                              Values: number of display, 'active', 'all' (default)
 
-  -r, --dmenu                Select the below action from dmenu or rofi.
-  -s, --screenshot           Take a screenshot
-  -m, --video                Record a video of the screen
-  -g, --gif                  Record a video and convert it to the gif format
-
 VIDEO OPTIONS
-  -c, --countdown NUM        Countdown before recording
+  -c, --countdown NUM        Countdown before recording.
 ```
 
 ## Installation

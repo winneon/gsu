@@ -14,16 +14,25 @@ The most common location for $XDG_CONFIG_HOME is ~/.config.
 GENERAL OPTIONS
 .TP
 \fB\-h\fR, \fB\-\-help\fR
-Show the help menu
+Show the help menu.
 .TP
 \fB\-v\fR, \fB\-\-version\fR
-Show the current version
+Show the current version.
 .TP
 \fB\-l\fR, \fB\-\-list\-displays\fR
 List your current displays and their resolutions.
 .TP
+\fB\-u\fR, \fB\-\-upload\fR
+Upload after running the utility.
+.TP
+\fB\-\-hide\fR
+Minimize the current window while capturing.
+This is useful when running with \fB\-\-terminal\fR to hide
+.IP
+the newly opened term.
+.TP
 \fB\-\-terminal\fR
-Open interactive commands in a new terminal.
+Open interactive commands in a new terminal..
 SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
 i.e. xbindkeys
 .TP
@@ -32,33 +41,32 @@ Send a libnotify notification of the output.
 .PP
 UTILITY OPTIONS
 .TP
-\fB\-u\fR, \fB\-\-upload\fR
-Upload after running the utility
+\fB\-r\fR, \fB\-\-dmenu\fR
+Select the one of the below options from dmenu or rofi.
+.TP
+\fB\-s\fR, \fB\-\-screenshot\fR
+Take a screenshot. (default)
+.TP
+\fB\-m\fR, \fB\-\-video\fR
+Record a video of the screen.
+.TP
+\fB\-g\fR, \fB\-\-gif\fR
+Record a video and convert it to the gif format.
+.PP
+CAPTURE OPTIONS
 .TP
 \fB\-n\fR, \fB\-\-nocursor\fR
-Hide the cursor
+Hide the cursor.
 .TP
 \fB\-d\fR, \fB\-\-display\fR NUM|TYPE
 Set the selection to a specific display.
 Can read from an argument or from stdin.
 Values: number of display, 'active', 'all' (default)
-.TP
-\fB\-r\fR, \fB\-\-dmenu\fR
-Select the below action from dmenu or rofi.
-.TP
-\fB\-s\fR, \fB\-\-screenshot\fR
-Take a screenshot
-.TP
-\fB\-m\fR, \fB\-\-video\fR
-Record a video of the screen
-.TP
-\fB\-g\fR, \fB\-\-gif\fR
-Record a video and convert it to the gif format
 .PP
 VIDEO OPTIONS
 .TP
 \fB\-c\fR, \fB\-\-countdown\fR NUM
-Countdown before recording
+Countdown before recording.
 .SH "SEE ALSO"
 The full documentation for
 .B gsu

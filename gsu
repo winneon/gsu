@@ -20,29 +20,32 @@ SOURCE defaults to \$XDG_CONFIG_HOME/gsu/imgs if nothing is provided.
 The most common location for \$XDG_CONFIG_HOME is ~/.config.
 
 GENERAL OPTIONS
-  -h, --help                 Show the help menu
-  -v, --version              Show the current version
+  -h, --help                 Show the help menu.
+  -v, --version              Show the current version.
   -l, --list-displays        List your current displays and their resolutions.
-  --terminal                 Open interactive commands in a new terminal.
+  -u, --upload               Upload after running the utility.
+  --hide                     Minimize the current window while capturing.
+                             This is useful when running with --terminal to hide
+							 the newly opened term.
+  --terminal                 Open interactive commands in a new terminal..
                              SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
                              i.e. xbindkeys
-
   --notify                   Send a libnotify notification of the output.
 
 UTILITY OPTIONS
-  -u, --upload               Upload after running the utility
-  -n, --nocursor             Hide the cursor
+  -r, --dmenu                Select the one of the below options from dmenu or rofi.
+  -s, --screenshot           Take a screenshot. (default)
+  -m, --video                Record a video of the screen.
+  -g, --gif                  Record a video and convert it to the gif format.
+
+CAPTURE OPTIONS
+  -n, --nocursor             Hide the cursor.
   -d, --display NUM|TYPE     Set the selection to a specific display.
                              Can read from an argument or from stdin.
                              Values: number of display, 'active', 'all' (default)
 
-  -r, --dmenu                Select the below action from dmenu or rofi.
-  -s, --screenshot           Take a screenshot
-  -m, --video                Record a video of the screen
-  -g, --gif                  Record a video and convert it to the gif format
-
 VIDEO OPTIONS
-  -c, --countdown NUM        Countdown before recording"
+  -c, --countdown NUM        Countdown before recording."
 
 	exit 0
 }
@@ -122,8 +125,16 @@ get_args() {
 		case "$1" in
 			"-h" | "--help") print_help ;;
 			"-v" | "--version") print_version ;;
-			"-u" | "--upload") upload="$1" ;;
 			"-l" | "--list-displays") print_displays ;;
+			"-u" | "--upload") upload="$1" ;;
+
+			"--hide")
+				if ! type -p xdotool >/dev/null; then
+					print_missing_deps "xdotool"
+				fi
+
+				hide="$1"
+			;;
 
 			"--terminal")
 				if [[ -z "$GSU_TERM" ]]; then
@@ -138,20 +149,6 @@ Set this variable in '$config_path/config.conf'."
 			;;
 
 			"--notify") notify_arg="$1" ;;
-
-			"-d" | "--display")
-				if [[ -t 0 ]]; then
-					display="$2"
-				else
-					display=$(cat)
-					display="${display:0:1}"
-
-					if [[ -z "$display" ]]; then
-						notify "gsu: display is empty, assuming quit from dmenu or rofi"
-						exit 1
-					fi
-				fi
-			;;
 
 			"-r" | "--dmenu")
 				if type -p dmenu >/dev/null; then
@@ -173,6 +170,20 @@ Set this variable in '$config_path/config.conf'."
 			"-m" | "--video") set_type "video" ;;
 			"-g" | "--gif") set_type "gif" ;;
 			"-n" | "--nocursor") nocursor="-u"; draw_mouse="-draw_mouse 0" ;;
+
+			"-d" | "--display")
+				if [[ -t 0 ]]; then
+					display="$2"
+				else
+					display=$(cat)
+					display="${display:0:1}"
+
+					if [[ -z "$display" ]]; then
+						notify "gsu: display is empty, assuming quit from dmenu or rofi"
+						exit 1
+					fi
+				fi
+			;;
 
 			"-c" | "--countdown")
 				if ! [[ $2 =~ ^[0-9]+$ ]]; then
@@ -294,6 +305,8 @@ get_command() {
 		fi
 	fi
 
+	check_minimize
+
 	case "$type" in
 		"screenshot")
 			if [[ -z "$display" ]]; then
@@ -312,10 +325,6 @@ get_command() {
 				fi
 			fi
 
-			if [[ ! -z "$countdown_enable" ]]; then
-				countdown "$countdown_enable" "Handing control over to ffmpeg in COUNTNUM seconds."
-			fi
-
 			if [[ -z "$AUDIO" ]]; then
 				if ! type -p pulseaudio >/dev/null; then
 					notify "\
@@ -328,6 +337,10 @@ Either install pulseaudio, or add your audio device to `$config_path/config.conf
 				AUDIO="pulse"
 			fi
 
+			if [[ ! -z "$countdown_enable" ]]; then
+				countdown "$countdown_enable" "Handing control over to ffmpeg in COUNTNUM seconds."
+			fi
+
 			echo "Press [q] or [Ctrl+C] to stop recording."
 
 			if [[ -z "$display" ]]; then
@@ -337,11 +350,26 @@ Either install pulseaudio, or add your audio device to `$config_path/config.conf
 			fi
 		;;
 	esac
+
+	check_maximize
 }
 
 set_type() {
 	if [[ -z "$type" ]]; then
 		type="$1"
+	fi
+}
+
+check_minimize() {
+	if [[ ! -z "$hide" ]]; then
+		xdotool_id=$(xdotool getactivewindow)
+		xdotool windowminimize $xdotool_id
+	fi
+}
+
+check_maximize() {
+	if [[ ! -z "$hide" ]] && [[ ! -z "$xdotool_id" ]]; then
+		xdotool windowactivate $xdotool_id
 	fi
 }
 
