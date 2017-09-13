@@ -3,15 +3,27 @@
 VERSION="1.1.2-git"
 config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
 
+notify() {
+	echo -e "$1"
+
+	if [[ ! -z "$notify_arg" ]] && type -p notify-send >/dev/null; then
+		notify-send "gsu" "$1"
+	fi
+}
+
 print_help() {
 	echo "\
 Usage: gsu [OPTION]... SOURCE
 A general screenshot and upload utility for images, video, and gifs.
 
+SOURCE defaults to \$XDG_CONFIG_HOME/gsu/imgs if nothing is provided.
+The most common location for \$XDG_CONFIG_HOME is ~/.config.
+
 GENERAL OPTIONS
   -h, --help                 Show the help menu
   -v, --version              Show the current version
   -l, --list-displays        List your current displays and their resolutions.
+  --notify                   Send a libnotify notification of the output.
 
   -u, --upload               Upload after running the utility
   -n, --nocursor             Hide the cursor
@@ -107,6 +119,7 @@ get_args() {
 			"-v" | "--version") print_version ;;
 			"-u" | "--upload") upload="$1" ;;
 			"-l" | "--list-displays") print_displays ;;
+			"--notify") notify_arg="$1" ;;
 
 			"-d" | "--display")
 				if [[ -t 0 ]]; then
@@ -116,7 +129,7 @@ get_args() {
 					display="${display:0:1}"
 
 					if [[ -z "$display" ]]; then
-						echo "gsu: display is empty, assuming quit from dmenu or rofi"
+						notify "gsu: display is empty, assuming quit from dmenu or rofi"
 						exit 1
 					fi
 				fi
@@ -181,8 +194,8 @@ get_args() {
 			"gif") ext=".gif" ;;
 		esac
 
-		operand="$config_path/$(date +"%F.%H-%M-%S.%N")$ext"
-		echo "Operand not provided - outputing to '$operand'."
+		mkdir -p "$config_path/imgs"
+		operand="$config_path/imgs/$(date +"%F.%H-%M-%S.%N")$ext"
 	fi
 }
 
@@ -278,7 +291,7 @@ get_command() {
 		done
 
 		if [[ "$MONW" == "0" ]] && [[ "$MONH" == "0" ]] && [[ "$MONX" == "0" ]] && [[ "$MONY" == "0" ]]; then
-			echo "gsu: unable to find your display"
+			notify "gsu: unable to find your display"
 			exit 1
 		fi
 	fi
@@ -307,9 +320,10 @@ get_command() {
 
 			if [[ -z "$AUDIO" ]]; then
 				if ! type -p pulseaudio >/dev/null; then
-					echo -e "\ngsu: no audio device set, default device 'pulse' cannot be found"
-					echo "Either install pulseaudio, "
-					echo "or add your audio device to `$config_path/config.conf`"
+					notify "
+gsu: no audio device set, default device 'pulse' cannot be found
+Either install pulseaudio,
+or add your audio device to `$config_path/config.conf`."
 
 					exit 1
 				fi
@@ -363,7 +377,7 @@ check_valid_exts() {
 		fi
 	done
 
-	echo "gsu: invalid $type file extension -- '$extension'"
+	notify "gsu: invalid $type file extension -- '$extension'"
 	exit 1
 }
 
@@ -381,8 +395,9 @@ take_screenshot() {
 
 		log "$cmd"
 
-		echo "gsu: maim returned an error"
-		echo "Check the most recent log in '$config_path/logs'."
+		notify "
+gsu: maim returned an error
+Check the most recent log in '$config_path/logs'."
 
 		exit 1
 	fi
@@ -406,12 +421,13 @@ take_video() {
 	get_command
 
 	if [[ -z "$cmd" ]]; then
-		echo "Stopped recording."
+		notify "Stopped recording."
 	else
 		log "$cmd"
 
-		echo -e "\ngsu: ffmpeg returned an error"
-		echo "Check the most recent log in '$config_path/logs'."
+		notify "
+gsu: ffmpeg returned an error
+Check the most recent log in '$config_path/logs'."
 
 		exit 1
 	fi
@@ -422,7 +438,7 @@ make_gif() {
 		print_missing_deps "ffmpeg"
 	fi
 
-	echo "Generating your GIF. This could take awhile depending on how large the selection was."
+	notify "Generating your GIF. This could take awhile depending on how large the selection was."
 	local cmd=$(ffmpeg -y -i "$operand.mp4" -vf "fps=30,palettegen" -loglevel error "/tmp/palette.png" 2>&1>/dev/null)
 
 	if [[ -z "$cmd" ]]; then
@@ -435,8 +451,9 @@ make_gif() {
 
 	log "$cmd"
 
-	echo -e "\ngsu: ffmpeg returned an error"
-	echo "Check the most recent log in '$config_path/logs'."
+	notify "
+gsu: ffmpeg returned an error
+Check the most recent log in '$config_path/logs'."
 
 	exit 1
 }
@@ -464,8 +481,9 @@ upload() {
 		"video")
 			if [[ -z "$V_UPLOAD" ]]; then
 				if [[ -z "$STREAMABLE_USER" ]] || [[ -z "$STREAMABLE_PASS" ]]; then
-					echo -e "\ngsu: invalid streamable credentials"
-					echo "Fill in your credentials in '$config_path/config.conf' and try again."
+					notify "
+gsu: invalid streamable credentials
+Fill in your credentials in '$config_path/config.conf' and try again."
 
 					exit 1
 				else
@@ -492,14 +510,14 @@ upload() {
 					rm "$output"
 
 					if [[ "$cmd" == "200" ]]; then
-						echo "Gfycat is processing..."
+						notify "Gfycat is processing..."
 						local count=0
 
 						while [[ "$(curl -s https://api.gfycat.com/v1/gfycats/fetch/status/$output | jq -e -r '.task')" != "complete" ]]; do
 							((count++))
 
 							if [[ $count == 300 ]]; then
-								echo -e "\ngsu: gfycat timed out while processing"
+								notify "gsu: gfycat timed out while processing"
 								exit 1
 							fi
 
@@ -508,7 +526,7 @@ upload() {
 
 						cmd="https://gfycat.com/$output"
 					else
-						echo -e "\ngsu: gfycat returned an invalid http code -- '$cmd'"
+						notify "gsu: gfycat returned an invalid http code -- '$cmd'"
 						exit 1
 					fi
 				fi
@@ -523,7 +541,7 @@ upload() {
 		echo -n "$cmd" | xclip -sel clip
 	fi
 
-	echo "$cmd"
+	notify "$cmd"
 }
 
 main() {

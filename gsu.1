@@ -8,6 +8,9 @@ gsu \- manual page for gsu 1.1.2-git
 .SH DESCRIPTION
 A general screenshot and upload utility for images, video, and gifs.
 .PP
+SOURCE defaults to \fI\,$XDG_CONFIG_HOME/gsu/imgs\/\fP if nothing is provided.
+The most common location for $XDG_CONFIG_HOME is ~/.config.
+.PP
 GENERAL OPTIONS
 .TP
 \fB\-h\fR, \fB\-\-help\fR
@@ -18,6 +21,9 @@ Show the current version
 .TP
 \fB\-l\fR, \fB\-\-list\-displays\fR
 List your current displays and their resolutions.
+.TP
+\fB\-\-notify\fR
+Send a libnotify notification of the output.
 .TP
 \fB\-u\fR, \fB\-\-upload\fR
 Upload after running the utility
