@@ -533,12 +533,12 @@ Fill in your credentials in '$config_path/config.conf' and try again."
 		;;
 	esac
 
-	if type -p xclip >/dev/null && [[ "$cmd" == "http"* ]]; then
-		echo -n "$cmd" | xclip
-		echo -n "$cmd" | xclip -sel clip
+	if type -p xsel >/dev/null && [[ "$cmd" == "http"* ]]; then
+		notify "test"
+		echo -n "$cmd" | xsel -ib
 	fi
 
-	notify "$cmd"
+	#notify "$cmd"
 }
 
 remove_args() {
