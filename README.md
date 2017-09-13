@@ -96,8 +96,8 @@ Install `maim`, `slop`, `ffmpeg`, `curl`, and `jq` using your package manager of
 After installing the dependents, run the following commands to install gsu.
 
 ```
-$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/1.1.2
-$ tar xvf gsu.tar.gz && cd gsu-1.1.2
+$ curl -o gsu.tar.gz https://codeload.github.com/winneon/gsu/tar.gz/1.3.0
+$ tar xvf gsu.tar.gz && cd gsu-1.3.0
 $ sudo make install
 ```
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.1.2-git"
+VERSION="1.3.0"
 config_path="${XDG_CONFIG_HOME:-${HOME}/.config}/gsu"
 
 notify() {
