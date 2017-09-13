@@ -9,6 +9,7 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 * GIF capture.
 * Built-in uploading to uguu.se, streamable, and gfycat.
 * Custom uploading capability if the above services don't suit your fancy.
+* dmenu and rofi integration.
 * A clean and easy to understand CLI.
 
 ## Usage
@@ -20,12 +21,15 @@ A general screenshot and upload utility for images, video, and gifs.
 GENERAL OPTIONS
   -h, --help                 Show the help menu
   -v, --version              Show the current version
+  -l, --list-displays        List your current displays and their resolutions.
 
   -u, --upload               Upload after running the utility
   -n, --nocursor             Hide the cursor
   -d, --display NUM|TYPE     Set the selection to a specific display.
+                             Can read from an argument or from stdin.
                              Values: number of display, 'active', 'all' (default)
 
+  -r, --dmenu                Select the below action from dmenu or rofi.
   -s, --screenshot           Take a screenshot
   -m, --video                Record a video of the screen
   -g, --gif                  Record a video and convert it to the gif format
