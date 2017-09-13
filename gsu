@@ -82,14 +82,6 @@ Valid characters: alphanumeric, dot, slash, underscore, dash."
 	exit 1
 }
 
-print_missing_operand() {
-	echo "\
-gsu: missing operand
-Try 'gsu --help' for more information."
-
-	exit 1
-}
-
 print_missing_deps() {
 	local args=""
 
@@ -178,8 +170,19 @@ get_args() {
 		shift
 	done
 
+	set_type "screenshot"
+
 	if [[ -z "$operand" ]]; then
-		print_missing_operand
+		local ext=""
+
+		case "$type" in
+			"screenshot") ext=".png" ;;
+			"video") ext=".mp4" ;;
+			"gif") ext=".gif" ;;
+		esac
+
+		operand="$config_path/$(date +"%F.%H-%M-%S.%N")$ext"
+		echo "Operand not provided - outputing to '$operand'."
 	fi
 }
 
@@ -526,7 +529,6 @@ upload() {
 main() {
 	get_config
 	get_args "$@"
-	set_type "screenshot"
 
 	case "$type" in
 		"screenshot")
