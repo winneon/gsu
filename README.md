@@ -18,11 +18,20 @@ gsu (General Screenshot Utility) allows for easy capturing and uploading of imag
 Usage: gsu [OPTION]... SOURCE
 A general screenshot and upload utility for images, video, and gifs.
 
+SOURCE defaults to \$XDG_CONFIG_HOME/gsu/imgs if nothing is provided.
+The most common location for \$XDG_CONFIG_HOME is ~/.config.
+
 GENERAL OPTIONS
   -h, --help                 Show the help menu
   -v, --version              Show the current version
   -l, --list-displays        List your current displays and their resolutions.
+  --terminal                 Open interactive commands in a new terminal.
+                             SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
+                             i.e. xbindkeys
 
+  --notify                   Send a libnotify notification of the output.
+
+UTILITY OPTIONS
   -u, --upload               Upload after running the utility
   -n, --nocursor             Hide the cursor
   -d, --display NUM|TYPE     Set the selection to a specific display.
@@ -99,6 +108,14 @@ You can optionally install `xclip` if you want automatic URL clipboard pasting a
 The configuration file can be found in `$XDG_CONFIG_HOME/gsu`. The most common location is `~/.config/gsu`.
 
 ```bash
+#!/usr/bin/env bash
+
+# Terminal. Uncomment to use.
+# If --terminal is provided, a new terminal using this variable will be opened.
+# Use the string "CMD" to refer to the command that is run (gsu).
+#
+# GSU_TERM=(gnome-terminal -- CMD)
+
 # Audio input device. If empty, gsu defaults to pulseaudio.
 # See https://www.ffmpeg.org/ffmpeg-devices.html#Input-Devices for a list
 # of valid input devices.
@@ -123,6 +140,7 @@ V_UPLOAD=""
 # Custom gif upload command. Leave empty to upload to gfycat.
 # Use the string "GSUFILEOUT" to refer to your gsu operand.
 G_UPLOAD=""
+
 ```
 
 ## Troubleshooting

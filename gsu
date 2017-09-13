@@ -23,8 +23,13 @@ GENERAL OPTIONS
   -h, --help                 Show the help menu
   -v, --version              Show the current version
   -l, --list-displays        List your current displays and their resolutions.
+  --terminal                 Open interactive commands in a new terminal.
+                             SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
+                             i.e. xbindkeys
+
   --notify                   Send a libnotify notification of the output.
 
+UTILITY OPTIONS
   -u, --upload               Upload after running the utility
   -n, --nocursor             Hide the cursor
   -d, --display NUM|TYPE     Set the selection to a specific display.
@@ -119,6 +124,19 @@ get_args() {
 			"-v" | "--version") print_version ;;
 			"-u" | "--upload") upload="$1" ;;
 			"-l" | "--list-displays") print_displays ;;
+
+			"--terminal")
+				if [[ -z "$GSU_TERM" ]]; then
+					notify "\
+gsu: \$GSU_TERM is not set
+Set this variable in '$config_path/config.conf'."
+
+					exit 1
+				fi
+
+				terminal_arg="$1"
+			;;
+
 			"--notify") notify_arg="$1" ;;
 
 			"-d" | "--display")
@@ -147,12 +165,7 @@ get_args() {
 				if [[ -z "$dmenu_type" ]]; then
 					print_missing_deps "dmenu or rofi"
 				else
-					case $(echo -e "Take a screenshot\nRecord a video\nRecord a video and covert it to the gif format" | "${dmenu_type[@]}") in
-						"Take a screenshot") set_type "screenshot" ;;
-						"Record a video") set_type "video" ;;
-						"Record a video and covert it to the gif format") set_type "gif" ;;
-						*) print_manually_quit ;;
-					esac
+					rofi_arg="$1"
 				fi
 			;;
 
@@ -182,21 +195,6 @@ get_args() {
 
 		shift
 	done
-
-	set_type "screenshot"
-
-	if [[ -z "$operand" ]]; then
-		local ext=""
-
-		case "$type" in
-			"screenshot") ext=".png" ;;
-			"video") ext=".mp4" ;;
-			"gif") ext=".gif" ;;
-		esac
-
-		mkdir -p "$config_path/imgs"
-		operand="$config_path/imgs/$(date +"%F.%H-%M-%S.%N")$ext"
-	fi
 }
 
 get_config() {
@@ -320,10 +318,9 @@ get_command() {
 
 			if [[ -z "$AUDIO" ]]; then
 				if ! type -p pulseaudio >/dev/null; then
-					notify "
+					notify "\
 gsu: no audio device set, default device 'pulse' cannot be found
-Either install pulseaudio,
-or add your audio device to `$config_path/config.conf`."
+Either install pulseaudio, or add your audio device to `$config_path/config.conf`."
 
 					exit 1
 				fi
@@ -395,7 +392,7 @@ take_screenshot() {
 
 		log "$cmd"
 
-		notify "
+		notify "\
 gsu: maim returned an error
 Check the most recent log in '$config_path/logs'."
 
@@ -421,11 +418,11 @@ take_video() {
 	get_command
 
 	if [[ -z "$cmd" ]]; then
-		notify "Stopped recording."
+		echo "Stopped recording."
 	else
 		log "$cmd"
 
-		notify "
+		notify "\
 gsu: ffmpeg returned an error
 Check the most recent log in '$config_path/logs'."
 
@@ -438,7 +435,7 @@ make_gif() {
 		print_missing_deps "ffmpeg"
 	fi
 
-	notify "Generating your GIF. This could take awhile depending on how large the selection was."
+	echo "Generating your GIF. This could take awhile depending on how large the selection was."
 	local cmd=$(ffmpeg -y -i "$operand.mp4" -vf "fps=30,palettegen" -loglevel error "/tmp/palette.png" 2>&1>/dev/null)
 
 	if [[ -z "$cmd" ]]; then
@@ -451,7 +448,7 @@ make_gif() {
 
 	log "$cmd"
 
-	notify "
+	notify "\
 gsu: ffmpeg returned an error
 Check the most recent log in '$config_path/logs'."
 
@@ -481,7 +478,7 @@ upload() {
 		"video")
 			if [[ -z "$V_UPLOAD" ]]; then
 				if [[ -z "$STREAMABLE_USER" ]] || [[ -z "$STREAMABLE_PASS" ]]; then
-					notify "
+					notify "\
 gsu: invalid streamable credentials
 Fill in your credentials in '$config_path/config.conf' and try again."
 
@@ -510,7 +507,7 @@ Fill in your credentials in '$config_path/config.conf' and try again."
 					rm "$output"
 
 					if [[ "$cmd" == "200" ]]; then
-						notify "Gfycat is processing..."
+					 	echo "Gfycat is processing..."
 						local count=0
 
 						while [[ "$(curl -s https://api.gfycat.com/v1/gfycats/fetch/status/$output | jq -e -r '.task')" != "complete" ]]; do
@@ -544,39 +541,94 @@ Fill in your credentials in '$config_path/config.conf' and try again."
 	notify "$cmd"
 }
 
+remove_args() {
+	local args=()
+
+	while [[ "$1" ]]; do
+		if [[ "$1" == "--terminal" ]]; then
+			shift
+		else
+			args+=("$1")
+			shift
+		fi
+	done
+
+	echo "${args[@]}"
+}
+
 main() {
 	get_config
 	get_args "$@"
 
-	case "$type" in
-		"screenshot")
-			if [[ -z "$S_UPLOAD" ]]; then
-				check_valid_exts "png,jpg"
+	if [[ -z "$terminal_arg" ]]; then
+		if [[ ! -z "$rofi_arg" ]]; then
+			case $(echo -e "Take a screenshot\nRecord a video\nRecord a video and covert it to the gif format" | "${dmenu_type[@]}") in
+				"Take a screenshot") set_type "screenshot" ;;
+				"Record a video") set_type "video" ;;
+				"Record a video and covert it to the gif format") set_type "gif" ;;
+				*) print_manually_quit ;;
+			esac
+		fi
+
+		set_type "screenshot"
+
+		if [[ -z "$operand" ]]; then
+			local ext=""
+
+			case "$type" in
+				"screenshot") ext=".png" ;;
+				"video") ext=".mp4" ;;
+				"gif") ext=".gif" ;;
+			esac
+
+			mkdir -p "$config_path/imgs"
+			operand="$config_path/imgs/$(date +"%F.%H-%M-%S.%N")$ext"
+		fi
+
+		case "$type" in
+			"screenshot")
+				if [[ -z "$S_UPLOAD" ]]; then
+					check_valid_exts "png,jpg"
+				fi
+
+				take_screenshot
+			;;
+
+			"video")
+				if [[ -z "$V_UPLOAD" ]]; then
+					check_valid_exts "mp4,mkv,mov"
+				fi
+
+				take_video
+			;;
+
+			"gif")
+				if [[ -z "$G_UPLOAD" ]]; then
+					check_valid_exts "gif"
+				fi
+
+				take_video
+				make_gif
+			;;
+		esac
+
+		if [[ ! -z "$upload" ]]; then
+			upload
+		fi
+	else
+		pushd $(dirname ${BASH_SOURCE[0]}) &>/dev/null
+		local absolute="$PWD/$(basename ${BASH_SOURCE[0]})"
+		popd &>/dev/null
+
+		local args=$(remove_args "$@")
+
+		for ((i = 0; i < ${#GSU_TERM[@]}; i++)); do
+			if [[ "${GSU_TERM[$i]}" == *"CMD"* ]]; then
+				GSU_TERM[$i]="${GSU_TERM[$i]//CMD/$absolute $args}"
 			fi
+		done
 
-			take_screenshot
-		;;
-
-		"video")
-			if [[ -z "$V_UPLOAD" ]]; then
-				check_valid_exts "mp4,mkv,mov"
-			fi
-
-			take_video
-		;;
-
-		"gif")
-			if [[ -z "$G_UPLOAD" ]]; then
-				check_valid_exts "gif"
-			fi
-
-			take_video
-			make_gif
-		;;
-	esac
-
-	if [[ ! -z "$upload" ]]; then
-		upload
+		eval "${GSU_TERM[@]}"
 	fi
 
 	exit 0
