@@ -562,10 +562,10 @@ main() {
 
 	if [[ -z "$terminal_arg" ]]; then
 		if [[ ! -z "$rofi_arg" ]]; then
-			case $(echo -e "Take a screenshot\nRecord a video\nRecord a video and covert it to the gif format" | "${dmenu_type[@]}") in
+			case $(echo -e "Take a screenshot\nRecord a video\nRecord a video and convert it to the gif format" | "${dmenu_type[@]}") in
 				"Take a screenshot") set_type "screenshot" ;;
 				"Record a video") set_type "video" ;;
-				"Record a video and covert it to the gif format") set_type "gif" ;;
+				"Record a video and convert it to the gif format") set_type "gif" ;;
 				*) print_manually_quit ;;
 			esac
 		fi
