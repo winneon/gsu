@@ -105,43 +105,7 @@ You can optionally install `xclip` if you want automatic URL clipboard pasting a
 
 ## Configuration
 
-The configuration file can be found in `$XDG_CONFIG_HOME/gsu`. The most common location is `~/.config/gsu`.
-
-```bash
-#!/usr/bin/env bash
-
-# Terminal. Uncomment to use.
-# If uncommented, be sure that the terminal you are providing is installed.
-# If --terminal is provided, a new terminal using this variable will be opened.
-# Use the string "CMD" to refer to the command that is run (gsu).
-#
-# GSU_TERM=(gnome-terminal -- CMD)
-
-# Audio input device. If empty, gsu defaults to pulseaudio.
-# See https://www.ffmpeg.org/ffmpeg-devices.html#Input-Devices for a list
-# of valid input devices.
-AUDIO=""
-
-# Streamable email/username.
-# REQUIRED for video upload without a custom upload command.
-STREAMABLE_USER=""
-
-# Streamable password.
-# REQUIRED for video upload without a custom upload command.
-STREAMABLE_PASS=""
-
-# Custom screenshot upload command. Leave empty to upload to uguu.se.
-# Use the string "GSUFILEOUT" to refer to your gsu operand.
-S_UPLOAD=""
-
-# Custom video upload command. Leave empty to upload to streamable.
-# Use the string "GSUFILEOUT" to refer to your gsu operand.
-V_UPLOAD=""
-
-# Custom gif upload command. Leave empty to upload to gfycat.
-# Use the string "GSUFILEOUT" to refer to your gsu operand.
-G_UPLOAD=""
-```
+Run the utility at least once, i.e. `gsu --help`. The configuration file will be generated in `$XDG_CONFIG_HOME/gsu` if it didn't already exist. The most common location is `~/.config/gsu`.
 
 ## Troubleshooting
 
