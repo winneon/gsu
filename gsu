@@ -614,6 +614,8 @@ main() {
 
 		if [[ ! -z "$upload" ]]; then
 			upload
+		else
+			notify "gsu: saved to '$operand'"
 		fi
 	else
 		pushd $(dirname ${BASH_SOURCE[0]}) &>/dev/null
