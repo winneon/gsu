@@ -562,7 +562,6 @@ Fill in your credentials in '$config_path/config.conf' and try again."
 	esac
 
 	if type -p xsel >/dev/null && [[ "$cmd" == "http"* ]]; then
-		notify "test"
 		echo -n "$cmd" | xsel -ib
 	fi
 

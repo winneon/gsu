@@ -66,7 +66,7 @@ gsu depends heavily on maim, slop, FFmpeg, curl, and jq for its functionality. T
 #### Arch Linux
 
 ```
-$ sudo pacman -S maim slop ffmpeg curl jq
+$ sudo pacman -S maim slop ffmpeg curl jq xdotool
 ```
 
 #### Debian 8
@@ -74,7 +74,7 @@ $ sudo pacman -S maim slop ffmpeg curl jq
 Be sure that the `unstable` repository is enabled on Debian, or your screenshots may not output properly. This is because Debian 8 has outdated versions of maim and slop.
 
 ```
-$ sudo apt-get install maim slop ffmpeg curl jq
+$ sudo apt-get install maim slop ffmpeg curl jq xdotool
 ```
 
 #### Ubuntu 17.04
@@ -84,7 +84,7 @@ $ sudo apt-get install maim slop ffmpeg curl jq
 If you can't wait until then, you can install [slop] and [maim] from source. Afterwards, run the following command to install the remaining dependencies.
 
 ```
-$ sudo apt-get install ffmpeg curl jq
+$ sudo apt-get install ffmpeg curl jq xdotool
 ```
 
 [slop]: https://github.com/naelstrof/slop#install-using-cmake-requires-cmake
@@ -92,7 +92,7 @@ $ sudo apt-get install ffmpeg curl jq
 
 #### Other Linux or BSD
 
-Install `maim`, `slop`, `ffmpeg`, `curl`, and `jq` using your package manager of choice. You could also install each package from source, but who has time for that?
+Install `maim`, `slop`, `ffmpeg`, `curl`, `jq`, and `xdotool` using your package manager of choice. You could also install each package from source, but who has time for that?
 
 ---
 
@@ -104,7 +104,7 @@ $ tar xvf gsu.tar.gz && cd gsu-1.3.0
 $ sudo make install
 ```
 
-You can optionally install `xclip` if you want automatic URL clipboard pasting after the utility finishes an upload.
+You can optionally install `xsel` if you want automatic URL clipboard pasting after the utility finishes an upload.
 
 ## Configuration
 
