@@ -121,6 +121,8 @@ print_manually_quit() {
 }
 
 get_args() {
+	local prev_arg=""
+
 	while [[ "$1" ]]; do
 		case "$1" in
 			"-h" | "--help") print_help ;;
@@ -196,14 +198,20 @@ Set this variable in '$config_path/config.conf'."
 			-*) print_invalid_option "$1" ;;
 
 			*)
-				if [[ "$1" =~ ^[a-zA-Z0-9_.\/-]+$ ]]; then
-					operand="$1"
-				else
-					print_invalid_operand "$1"
-				fi
+				case "$prev_arg" in
+					"-d" | "--display" | "-c" | "--countdown") ;;
+					*)
+						if [[ "$1" =~ ^[a-zA-Z0-9_.\/-]+$ ]]; then
+							operand="$1"
+						else
+							print_invalid_operand "$1"
+						fi
+					;;
+				esac
 			;;
 		esac
 
+		prev_arg="$1"
 		shift
 	done
 }
@@ -321,6 +329,7 @@ get_command() {
 				read -r X Y W H G ID < <(slop -f "%x %y %w %h %g %i")
 
 				if [[ -z "$X" ]] || [[ -z "$Y" ]] || [[ -z "$W" ]] || [[ -z "$H" ]]; then
+					check_maximize
 					print_manually_quit
 				fi
 			fi
@@ -330,6 +339,7 @@ get_command() {
 					notify "\
 gsu: no audio device set, default device 'pulse' cannot be found
 Either install pulseaudio, or add your audio device to `$config_path/config.conf`."
+					check_maximize
 
 					exit 1
 				fi
@@ -338,7 +348,9 @@ Either install pulseaudio, or add your audio device to `$config_path/config.conf
 			fi
 
 			if [[ ! -z "$countdown_enable" ]]; then
+				check_maximize
 				countdown "$countdown_enable" "Handing control over to ffmpeg in COUNTNUM seconds."
+				check_minimize
 			fi
 
 			echo "Press [q] or [Ctrl+C] to stop recording."
@@ -364,6 +376,7 @@ check_minimize() {
 	if [[ ! -z "$hide" ]]; then
 		xdotool_id=$(xdotool getactivewindow)
 		xdotool windowminimize $xdotool_id
+		sleep 0.5
 	fi
 }
 
