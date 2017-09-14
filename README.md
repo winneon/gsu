@@ -28,7 +28,7 @@ GENERAL OPTIONS
   -u, --upload               Upload after running the utility.
   --hide                     Minimize the current window while capturing.
                              This is useful when running with --terminal to hide
-							 the newly opened term.
+                             the newly opened term.
   --terminal                 Open interactive commands in a new terminal..
                              SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
                              i.e. xbindkeys
