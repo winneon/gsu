@@ -73,15 +73,19 @@ $ sudo pacman -S maim slop ffmpeg curl jq xdotool
 
 Be sure that the `unstable` repository is enabled on Debian, or your screenshots may not output properly. This is because Debian 8 has outdated versions of maim and slop.
 
+Afterwards, run the command in the Ubuntu 17.10 section below.
+
+#### Ubuntu 17.10
+
 ```
 $ sudo apt-get install maim slop ffmpeg curl jq xdotool
 ```
 
-#### Ubuntu 17.04
+#### Ubuntu 17.04 and older
 
-**Unsupported.** slop and maim both are terribly out of date in Ubuntu's 17.04 repositories, resulting in artifacting and improper screenshots. When Ubuntu 17.10 is released, it will be properly supported.
+**Unsupported.** slop and maim both are terribly out of date in older Ubuntu repositories, resulting in artifacting and improper screenshots.
 
-If you can't wait until then, you can install [slop] and [maim] from source. Afterwards, run the following command to install the remaining dependencies.
+Your only option is to install [slop] and [maim] from source. Afterwards, run the following command to install the remaining dependencies.
 
 ```
 $ sudo apt-get install ffmpeg curl jq xdotool
@@ -119,7 +123,7 @@ Here are some frequent problems users may face and their respective solutions. I
 This is a common problem with older versions of maim. You have a few choices:
 
 * On Debian 8, enable the `unstable` APT repository, and upgrade maim and slop.
-* On Ubuntu 17.04 and other distros, install both maim and slop from source.
+* On Ubuntu versions prior to 17.10 and other distros, install both maim and slop from source.
 
 ### There is no audio in the captured video.
 
