@@ -24,12 +24,12 @@ GENERAL OPTIONS
   -v, --version              Show the current version.
   -l, --list-displays        List your current displays and their resolutions.
   -u, --upload               Upload after running the utility.
-  --hide                     Minimize the current window while capturing.
-                             This is useful when running with --terminal to hide
-                             the newly opened term.
   --terminal                 Open interactive commands in a new terminal..
                              SET THIS IF RUNNING FROM ANYTHING OTHER THAN A TERM,
                              i.e. xbindkeys
+  --hide                     Minimize the current window while capturing.
+                             This is useful when running with --terminal to hide
+                             the newly opened term.
   --notify                   Send a libnotify notification of the output.
 
 UTILITY OPTIONS
@@ -39,10 +39,13 @@ UTILITY OPTIONS
   -g, --gif                  Record a video and convert it to the gif format.
 
 CAPTURE OPTIONS
-  -n, --nocursor             Hide the cursor.
+  -n, --no-cursor            Hide the cursor.
   -d, --display NUM|TYPE     Set the selection to a specific display.
                              Can read from an argument or from stdin.
                              Values: number of display, 'active', 'all' (default)
+
+SCREENSHOT OPTIONS
+  -o, --no-opengl            Disable OpenGL hardware-accelerated capture.
 
 VIDEO OPTIONS
   -c, --countdown NUM        Countdown before recording."
@@ -171,7 +174,7 @@ Set this variable in '$config_path/config.conf'."
 			"-s" | "--screenshot") set_type "screenshot" ;;
 			"-m" | "--video") set_type "video" ;;
 			"-g" | "--gif") set_type "gif" ;;
-			"-n" | "--nocursor") nocursor="-u"; draw_mouse="-draw_mouse 0" ;;
+			"-n" | "--no-cursor") nocursor="-u"; draw_mouse="-draw_mouse 0" ;;
 
 			"-d" | "--display")
 				if [[ -t 0 ]]; then
@@ -186,6 +189,8 @@ Set this variable in '$config_path/config.conf'."
 					fi
 				fi
 			;;
+			
+			"-o" | "--no-opengl") noopengl="--noopengl" ;;
 
 			"-c" | "--countdown")
 				if ! [[ $2 =~ ^[0-9]+$ ]]; then
@@ -318,9 +323,9 @@ get_command() {
 	case "$type" in
 		"screenshot")
 			if [[ -z "$display" ]]; then
-				cmd="$(maim $nocursor -s "$operand" 2>&1>/dev/null)"
+				cmd="$(maim $noopengl $nocursor -s "$operand" 2>&1>/dev/null)"
 			else
-				cmd="$(maim $nocursor -g "${MONW}x${MONH}+${MONX}+${MONY}" "$operand" 2>&1>/dev/null)"
+				cmd="$(maim $noopengl $nocursor -g "${MONW}x${MONH}+${MONX}+${MONY}" "$operand" 2>&1>/dev/null)"
 			fi
 		;;
 
