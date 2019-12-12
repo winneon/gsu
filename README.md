@@ -82,7 +82,7 @@ maim, slop, and FFmpeg all have bugs in earlier versions that make gsu unusable 
 Afterwards, run the following command to install the remaining required dependencies.
 
 ```
-$ sudo apt install curl jq xdotool maim slop
+$ sudo apt install curl jq xdotool
 ```
 
 #### Other Linux or BSD
