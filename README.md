@@ -52,12 +52,10 @@ VIDEO OPTIONS
 
 ## Installation
 
-### Arch Linux
+### Package Manager
 
-Install **[gsu]** or **[gsu-git]** from the AUR.
-
-[gsu]: https://aur.archlinux.org/packages/gsu/
-[gsu-git]: https://aur.archlinux.org/packages/gsu-git/
+* [Arch Linux (AUR): gsu](https://aur.archlinux.org/packages/gsu/)
+* [Arch Linux (AUR): gsu-git](https://aur.archlinux.org/packages/gsu-git/)
 
 ### Manual
 
