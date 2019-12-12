@@ -59,46 +59,43 @@ Install **[gsu]** or **[gsu-git]** from the AUR.
 [gsu]: https://aur.archlinux.org/packages/gsu/
 [gsu-git]: https://aur.archlinux.org/packages/gsu-git/
 
-### Universal Install
+### Manual
 
-gsu depends heavily on maim, slop, FFmpeg, curl, and jq for its functionality. To install gsu's dependencies, run the following commands in accordance to your distro.
+To install gsu's required dependencies, run the following command in accordance to your distro.
 
 #### Arch Linux
 
 ```
-$ sudo pacman -S maim slop ffmpeg curl jq xdotool
+$ sudo pacman -S curl jq xdotool maim slop ffmpeg
 ```
 
-#### Debian 8
-
-Be sure that the `unstable` repository is enabled on Debian, or your screenshots may not output properly. This is because Debian 8 has outdated versions of maim and slop.
-
-Afterwards, run the command in the Ubuntu 17.10 section below.
-
-#### Ubuntu 17.10
+#### Ubuntu 20.04 LTS/Debian 11
 
 ```
-$ sudo apt-get install maim slop ffmpeg curl jq xdotool
+$ sudo apt install curl jq xdotool maim slop ffmpeg
 ```
 
-#### Ubuntu 17.04 and older
+#### Older Debian-based (Ubuntu 19.10/Debian 10 or prior)
 
-**Unsupported.** slop and maim both are terribly out of date in older Ubuntu repositories, resulting in artifacting and improper screenshots.
+maim, slop, and FFmpeg all have bugs in earlier versions that make gsu unusable in certain scenarios. Therefore, they must all be installed via source.
 
-Your only option is to install [slop] and [maim] from source. Afterwards, run the following command to install the remaining dependencies.
+Afterwards, run the following command to install the remaining required dependencies.
 
 ```
-$ sudo apt-get install ffmpeg curl jq xdotool
+$ sudo apt install curl jq xdotool maim slop
 ```
-
-[slop]: https://github.com/naelstrof/slop#install-using-cmake-requires-cmake
-[maim]: https://github.com/naelstrof/maim#install-using-your-package-manager-preferred
 
 #### Other Linux or BSD
 
-Install `maim`, `slop`, `ffmpeg`, `curl`, `jq`, and `xdotool` using your package manager of choice. You could also install each package from source, but who has time for that?
+Install `curl`, `jq`, `xdotool`, `maim`, `slop`, and `ffmpeg` via source or your package manager of choice. *If installing by package manager, ensure that the following required versions are met.*
+
+*maim*: 5.x or later  
+*slop*: 7.x or later  
+*FFmpeg*: 4.2.x or later
 
 ---
+
+You can optionally install `xsel` if you want automatic URL clipboard pasting after the utility finishes an upload.
 
 After installing the dependents, run the following commands to install gsu.
 
@@ -108,8 +105,6 @@ $ tar xvf gsu.tar.gz && cd gsu-1.3.2
 $ sudo make install
 ```
 
-You can optionally install `xsel` if you want automatic URL clipboard pasting after the utility finishes an upload.
-
 ## Configuration
 
 Run the utility at least once, i.e. `gsu --help`. The configuration file will be generated in `$XDG_CONFIG_HOME/gsu` if it didn't already exist. The most common location is `~/.config/gsu`.
@@ -118,24 +113,35 @@ Run the utility at least once, i.e. `gsu --help`. The configuration file will be
 
 Here are some frequent problems users may face and their respective solutions. If you have more solutions, feel free to send in an issue or pull request.
 
-### The outputted screenshot has weird black or white sections.
+### The outputted capture is completely black or another solid color.
 
-This is a common problem with older versions of maim. You have a few choices:
+Make sure that you are running your DE/WM under the latest version of X11. Wayland is untested. To check, run the following command.
 
-* On Debian 8, enable the `unstable` APT repository, and upgrade maim and slop.
-* On Ubuntu versions prior to 17.10 and other distros, install both maim and slop from source.
+```
+$ echo $XDG_SESSION_TYPE
+```
+
+If you are running X11 and the problem persists, try disabling OpenGL hardware-based acceleration by adding `--no-opengl` to your gsu command.
+
+### The outputted capture has black/white sections or artifacts.
+
+This is a problem with older versions of maim. Upgrade maim to 5.x or later or install via source.
+
+### The capture session won't end when capturing a video or gif.
+
+Versions of FFmpeg prior to 4.2.x have a bug where an `x11grab` capture sessions won't end unless forcibly killed by the system. Upgrade FFmpeg to 4.2.x or install via source.
 
 ### There is no audio in the captured video.
 
-Pulseaudio is the default audio capture device. If you do not use pulseaudio, adjust your audio capture device in the configuration file.
+PulseAudio is the default audio capture device. If you do not use PulseAudio, adjust your audio capture device in the configuration file.
 
-If you do use pulseaudio, use a program like `pavucontrol` to change the input device to a monitor of your audio output device. If you use `pavucontrol`, the resulting setup should look similar to below.
+If you do use PulseAudio, use a program like `pavucontrol` to change the input device to a monitor of your audio output device. If you use PAVUcontrol, the resulting setup should look similar to below.
 
 ![pavucontrol example](http://i.imgur.com/qbN5741.png)
 
 ## Credits
 
 * [Dalton Nell](https://github.com/naelstrof) for maim and slop, used for screenshot creation and selections
-* [The FFmpeg team](https://ffmpeg.org/) for ffmpeg, used for video and gif creation
+* [The FFmpeg team](https://ffmpeg.org/) for FFmpeg, used for video and gif creation
 * [Daniel Stenberg](https://github.com/bagder) for curl, used for uploading
 * [Stephen Dolan](https://github.com/stedolan) for jq, used for parsing JSON
