@@ -13,8 +13,10 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
 # set main entry point into program
-add_executable(gsu src/main.cpp)
+add_executable(gsu src/main.cpp src/util.cpp)
 
-# include dependencies
+# add libraries
 find_package(Boost REQUIRED COMPONENTS program_options)
+
+# link libraries
 target_link_libraries(gsu PUBLIC Boost::program_options)
